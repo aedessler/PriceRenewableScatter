@@ -8,6 +8,7 @@ from sklearn.metrics import r2_score
 
 # Configuration - Set regression type
 INCLUDE_RENEWABLE = False  # Set to False for gas-only regression, True for gas + renewable regression
+INCLUDE_2022 = False  # Set to False to exclude 2022 data from linear fit (but still show on plot)
 
 def get_natural_gas_data():
     # Read European natural gas prices from CMO Excel file
@@ -102,53 +103,66 @@ def perform_regression_analysis():
             merged_data = pd.merge(merged_data, country_renewable, on=['Country', 'Year'], how='inner')
         
         if len(merged_data) >= 3:  # Need at least 3 data points for regression
-            # Prepare data for regression
-            if INCLUDE_RENEWABLE:
-                X = merged_data[['Gas_Price', 'Renewable_Fraction']].values
+            # Filter data for regression based on INCLUDE_2022 setting
+            if INCLUDE_2022:
+                regression_data = merged_data
             else:
-                X = merged_data[['Gas_Price']].values
-            y = merged_data['Price (EUR/MWhe)'].values
+                regression_data = merged_data[merged_data['Year'] != 2022]
             
-            # Perform linear regression
-            model = LinearRegression()
-            model.fit(X, y)
-            
-            # Make predictions
-            y_pred = model.predict(X)
-            
-            # Calculate R-squared
-            r2 = r2_score(y, y_pred)
-            
-            # Store results
-            result = {
-                'Country': country,
-                'Gas_Coeff': model.coef_[0],
-                'Renewable_Coeff': model.coef_[1] if INCLUDE_RENEWABLE else None,
-                'Intercept': model.intercept_,
-                'R_squared': r2,
-                'Data_Points': len(merged_data),
-                'Years': f"{merged_data['Year'].min()}-{merged_data['Year'].max()}",
-                'Model': model,
-                'Data': merged_data,
-                'Include_Renewable': INCLUDE_RENEWABLE
-            }
-            regression_results.append(result)
-            
-            # Print results
-            print(f"\n{country}:")
-            if INCLUDE_RENEWABLE:
-                print(f"  Price = {model.coef_[0]:.3f} * Gas_Cost + {model.coef_[1]:.1f} * Renewable_Fraction + {model.intercept_:.2f}")
+            # Check if we still have enough data points after filtering
+            if len(regression_data) >= 3:
+                # Prepare data for regression
+                if INCLUDE_RENEWABLE:
+                    X = regression_data[['Gas_Price', 'Renewable_Fraction']].values
+                else:
+                    X = regression_data[['Gas_Price']].values
+                y = regression_data['Price (EUR/MWhe)'].values
+                
+                # Perform linear regression
+                model = LinearRegression()
+                model.fit(X, y)
+                
+                # Make predictions
+                y_pred = model.predict(X)
+                
+                # Calculate R-squared
+                r2 = r2_score(y, y_pred)
+                
+                # Store results
+                result = {
+                    'Country': country,
+                    'Gas_Coeff': model.coef_[0],
+                    'Renewable_Coeff': model.coef_[1] if INCLUDE_RENEWABLE else None,
+                    'Intercept': model.intercept_,
+                    'R_squared': r2,
+                    'Data_Points': len(merged_data),  # Keep original merged_data count for display
+                    'Regression_Points': len(regression_data),  # Points used for regression
+                    'Years': f"{merged_data['Year'].min()}-{merged_data['Year'].max()}",
+                    'Model': model,
+                    'Data': merged_data,  # Keep full data for plotting
+                    'Include_Renewable': INCLUDE_RENEWABLE
+                }
+                regression_results.append(result)
+                
+                # Print results
+                print(f"\n{country}:")
+                if INCLUDE_RENEWABLE:
+                    print(f"  Price = {model.coef_[0]:.3f} * Gas_Cost + {model.coef_[1]:.1f} * Renewable_Fraction + {model.intercept_:.2f}")
+                else:
+                    print(f"  Price = {model.coef_[0]:.3f} * Gas_Cost + {model.intercept_:.2f}")
+                print(f"  R² = {r2:.3f}")
+                print(f"  Data points: {len(merged_data)} ({merged_data['Year'].min()}-{merged_data['Year'].max()})")
+                if not INCLUDE_2022:
+                    print(f"  Regression points: {len(regression_data)} (2022 excluded from fit)")
+                
+                # Interpret coefficients
+                gas_impact = "increases" if model.coef_[0] > 0 else "decreases"
+                print(f"  Gas price impact: 1 $/MMBtu {gas_impact} electricity price by {abs(model.coef_[0]):.3f} EUR/MWh")
+                if INCLUDE_RENEWABLE:
+                    renewable_impact = "increases" if model.coef_[1] > 0 else "decreases"
+                    print(f"  Renewable impact: 1% increase in renewables {renewable_impact} electricity price by {abs(model.coef_[1]*0.01):.3f} EUR/MWh")
             else:
-                print(f"  Price = {model.coef_[0]:.3f} * Gas_Cost + {model.intercept_:.2f}")
-            print(f"  R² = {r2:.3f}")
-            print(f"  Data points: {len(merged_data)} ({merged_data['Year'].min()}-{merged_data['Year'].max()})")
-            
-            # Interpret coefficients
-            gas_impact = "increases" if model.coef_[0] > 0 else "decreases"
-            print(f"  Gas price impact: 1 $/MMBtu {gas_impact} electricity price by {abs(model.coef_[0]):.3f} EUR/MWh")
-            if INCLUDE_RENEWABLE:
-                renewable_impact = "increases" if model.coef_[1] > 0 else "decreases"
-                print(f"  Renewable impact: 1% increase in renewables {renewable_impact} electricity price by {abs(model.coef_[1]*0.01):.3f} EUR/MWh")
+                print(f"\n{country}: Insufficient data for regression after filtering (only {len(regression_data)} data points)")
         else:
             print(f"\n{country}: Insufficient data for regression (only {len(merged_data)} data points)")
     
@@ -188,8 +202,24 @@ def plot_regression_results(regression_results):
                            label=f'Fit (R²={result["R_squared"]:.3f})')
                 
                 # Create scatter plot (on top of the line)
-                scatter = axes[i].scatter(data['Gas_Price'], data['Price (EUR/MWhe)'], 
-                                        alpha=0.8, s=60, edgecolors='black', color='steelblue', zorder=2)
+                # Distinguish 2022 data points if they're excluded from regression
+                if not INCLUDE_2022 and 2022 in data['Year'].values:
+                    data_2022 = data[data['Year'] == 2022]
+                    data_other = data[data['Year'] != 2022]
+                    
+                    # Plot non-2022 data points (used in regression)
+                    scatter1 = axes[i].scatter(data_other['Gas_Price'], data_other['Price (EUR/MWhe)'], 
+                                             alpha=0.8, s=60, edgecolors='black', color='steelblue', zorder=2,
+                                             label='Used in fit')
+                    
+                    # Plot 2022 data points (excluded from regression) with different color
+                    scatter2 = axes[i].scatter(data_2022['Gas_Price'], data_2022['Price (EUR/MWhe)'], 
+                                             alpha=0.8, s=60, edgecolors='black', color='red', zorder=2,
+                                             label='2022 (excluded from fit)')
+                else:
+                    # Plot all data points normally
+                    scatter = axes[i].scatter(data['Gas_Price'], data['Price (EUR/MWhe)'], 
+                                            alpha=0.8, s=60, edgecolors='black', color='steelblue', zorder=2)
                 
                 # Customize plot
                 axes[i].set_xlabel('Annual Avg European Natural Gas Price ($/MMBtu)')
