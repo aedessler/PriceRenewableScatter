@@ -12,8 +12,8 @@ INCLUDE_2022 = False  # Set to False to exclude 2022 data from linear fit (but s
 
 def get_natural_gas_data():
     # Read European natural gas prices from CMO Excel file
-    header_df = pd.read_excel('CMO-Historical-Data-Monthly.xlsx', sheet_name='Monthly Prices', skiprows=3, nrows=1)
-    df = pd.read_excel('CMO-Historical-Data-Monthly.xlsx', sheet_name='Monthly Prices', skiprows=4)
+    header_df = pd.read_excel('data/CMO-Historical-Data-Monthly.xlsx', sheet_name='Monthly Prices', skiprows=3, nrows=1)
+    df = pd.read_excel('data/CMO-Historical-Data-Monthly.xlsx', sheet_name='Monthly Prices', skiprows=4)
     
     # Set proper column names
     df.columns = header_df.iloc[0].tolist()
@@ -44,7 +44,7 @@ def get_natural_gas_data():
 
 def get_renewable_data():
     # Read renewable energy data from CSV
-    renewable_df = pd.read_csv('share-of-electricity-production-from-solar-and-wind/share-of-electricity-production-from-solar-and-wind.csv')
+    renewable_df = pd.read_csv('data/share-of-electricity-production-from-solar-and-wind/share-of-electricity-production-from-solar-and-wind.csv')
     
     # Rename columns for consistency
     renewable_df = renewable_df.rename(columns={
@@ -59,7 +59,7 @@ def get_renewable_data():
     return renewable_df[['Country', 'Year', 'Renewable_Fraction']]
 
 def load_and_process_data():
-    price_df = pd.read_csv('european_wholesale_electricity_price_data_monthly.csv')
+    price_df = pd.read_csv('data/european_wholesale_electricity_price_data_monthly.csv')
     gas_df = get_natural_gas_data()
     renewable_df = get_renewable_data()
     

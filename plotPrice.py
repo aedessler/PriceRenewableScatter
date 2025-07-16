@@ -267,9 +267,9 @@ def plot_price_vs_renewables(year, price_csv, renew_csv):
     plt.show()
 
 # Paths to your data files
-price_csv = 'european_wholesale_electricity_price_data_monthly.csv'
-renew_csv = 'share-of-electricity-production-from-solar-and-wind/share-of-electricity-production-from-solar-and-wind.csv'
-retail_excel = 'ten00117_page_spreadsheet.xlsx'
+price_csv = 'data/european_wholesale_electricity_price_data_monthly.csv'
+renew_csv = 'data/share-of-electricity-production-from-solar-and-wind/share-of-electricity-production-from-solar-and-wind.csv'
+retail_excel = 'data/ten00117_page_spreadsheet.xlsx'
 
 # Generate the wholesale price plots
 # plot_price_vs_renewables(2022, price_csv, renew_csv)
