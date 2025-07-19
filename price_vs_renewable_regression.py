@@ -8,7 +8,7 @@ from sklearn.metrics import r2_score
 
 # Configuration - Set regression type
 INCLUDE_RENEWABLE = False  # Set to False for gas-only regression, True for gas + renewable regression
-INCLUDE_2022 = False  # Set to False to exclude 2022 data from linear fit (but still show on plot)
+INCLUDE_2022 = True  # Set to False to exclude 2022 data from linear fit (but still show on plot)
 
 def get_natural_gas_data():
     # Read European natural gas prices from CMO Excel file

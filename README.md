@@ -37,7 +37,7 @@ Analyzes European wholesale electricity prices vs renewable energy share for 202
 python plotPrice.py
 ```
 
-**Note**: All data files are now located in the `data/` directory.
+**Note**: All data files are located in the `data/` directory.
 
 ### 2. `renewable_price_analysis.py`
 Comprehensive analysis of US RTO data comparing renewable energy percentage (wind + solar) vs load-weighted average wholesale electricity prices for 2023 and 2024.
