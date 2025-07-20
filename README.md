@@ -1,6 +1,6 @@
 # Renewable Energy vs Wholesale Price Analysis
 
-This project analyzes the relationship between renewable energy share and wholesale electricity prices using two different datasets and approaches: European country-level data and US Regional Transmission Organization (RTO) data.
+This project analyzes the relationship between renewable energy share and wholesale electricity prices using European country-level data. The analysis includes multiple approaches: correlation studies, regression analysis with natural gas prices, and detailed electricity price component breakdowns.
 
 ## Files Overview
 
@@ -37,8 +37,6 @@ Analyzes European wholesale electricity prices vs renewable energy share for 202
 python plotPrice.py
 ```
 
-**Note**: All data files are located in the `data/` directory.
-
 ### 2. `renewable_price_analysis.py`
 Comprehensive analysis of US RTO data comparing renewable energy percentage (wind + solar) vs load-weighted average wholesale electricity prices for 2023 and 2024.
 
@@ -62,11 +60,61 @@ Comprehensive analysis of US RTO data comparing renewable energy percentage (win
 python renewable_price_analysis.py
 ```
 
+### 3. `electricity_price_components.py`
+Creates detailed stacked bar charts showing electricity price components (generation, network costs, and taxes) for European countries using Eurostat data.
+
+**Data Sources:**
+- `data/nrg_pc_204_c__custom_17509578_spreadsheet.xlsx` - Eurostat electricity price components data
+  - Source: [Eurostat Energy Database (nrg_pc_204_c)](https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_204_c__custom_17509578/default/table?lang=en)
+  - Description: Detailed breakdown of electricity prices for household consumers
+  - Components: Energy supply, network costs, taxes, fees, levies, VAT, renewable energy taxes, capacity charges, environmental taxes
+  - Coverage: 45 European countries/regions including EU27, Euro area, and individual member states
+  - Time Period: 2017-2024
+  - Consumption Bands: <1,000 kWh and 1,000-2,499 kWh annual consumption
+
+**Features:**
+- Configurable analysis by year and consumption band
+- Automatic data loading and processing from multiple Excel sheets
+- Stacked bar chart visualization showing price component breakdown
+- Summary statistics and data tables
+- Professional styling with clear component categories
+- Error handling and data validation
+
+**Usage:**
+```bash
+python electricity_price_components.py
+```
+
+### 4. `price_vs_renewable_regression.py`
+Performs regression analysis of European electricity prices against natural gas prices and renewable energy share to understand price drivers.
+
+**Data Sources:**
+- `data/european_wholesale_electricity_price_data_monthly.csv` - Monthly wholesale electricity prices (Ember Energy)
+- `data/CMO-Historical-Data-Monthly.xlsx` - Natural gas prices (World Bank Commodity Markets)
+- `data/share-of-electricity-production-from-solar-and-wind/` - Renewable energy share (Our World in Data)
+
+**Analysis Models:**
+- **Gas-only model**: `Price = a * Gas_Cost + c`
+- **Gas + Renewable model**: `Price = a * Gas_Cost + b * Renewable_Fraction + c`
+
+**Configuration Options:**
+- `INCLUDE_RENEWABLE`: Toggle between gas-only and gas+renewable regression
+- `INCLUDE_2022`: Option to exclude 2022 data from regression (useful for analyzing COVID-19 impact)
+
+**Usage:**
+```bash
+python price_vs_renewable_regression.py
+```
+
 ## Data Sources and Credits
 
 ### European Data
 - **Price Data**: Ember Energy European Wholesale Electricity Price Data
 - **Renewable Data**: Our World in Data compilation from Ember and Energy Institute sources
+- **Hydroelectric Data**: Our World in Data compilation from Ember and Energy Institute sources
+  - Source: [Our World in Data - Share of electricity production from hydropower](https://ourworldindata.org/grapher/share-electricity-hydro)
+  - File: `data/share-electricity-hydro/share-electricity-hydro.csv`
+  - Coverage: Global hydroelectric generation share data (1985-2024)
 - **Natural Gas Price Data**: World Bank Commodity Markets data
   - Source: https://thedocs.worldbank.org/en/doc/5d903e848db1d1b83e0ec8f744e55570-0350012021/related/CMO-Historical-Data-Monthly.xlsx
   - File: `data/CMO-Historical-Data-Monthly.xlsx`
@@ -98,9 +146,13 @@ python renewable_price_analysis.py
 - **Metrics**: Load-weighted average prices, renewable generation percentages
 - **Data Resolution**: Hourly timestamps with fuel mix breakdowns
 
+## Generated Analysis Products
+
+- **electricity_vs_gas_renewable_with_fit.pdf**: Comprehensive analysis document showing the relationship between electricity prices, natural gas costs, and renewable energy penetration
+
 ## Technical Dependencies
 
-Both scripts require:
+All scripts require:
 - pandas
 - numpy
 - matplotlib
@@ -109,6 +161,16 @@ Both scripts require:
 - pathlib (for file handling)
 - warnings (for clean output)
 
+Additional dependencies for specific scripts:
+- **price_vs_renewable_regression.py**: scikit-learn (LinearRegression, r2_score)
+
 ## Analysis Methodology
 
-The analysis compares renewable energy penetration (percentage of electricity from wind and solar) against wholesale electricity prices to identify potential correlations. The European analysis uses country-level aggregated data, while the US RTO analysis uses high-resolution hourly data with load-weighted price calculations for more accurate market representation.
+The project employs multiple analytical approaches:
+
+1. **Correlation Analysis**: Direct correlation between renewable energy penetration and wholesale electricity prices
+2. **Regression Modeling**: Multiple regression analysis incorporating natural gas prices as a control variable
+3. **Price Component Analysis**: Breakdown of electricity prices into constituent components (generation, network, taxes)
+4. **Comparative Analysis**: Cross-country and cross-regional comparisons
+
+The European analysis uses country-level aggregated data, while the US RTO analysis uses high-resolution hourly data with load-weighted price calculations for more accurate market representation. The regression analysis helps isolate the impact of renewable energy on prices by controlling for natural gas price fluctuations, which are a major driver of electricity costs in gas-fired power generation.
