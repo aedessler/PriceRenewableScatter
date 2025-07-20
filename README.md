@@ -86,20 +86,31 @@ python electricity_price_components.py
 ```
 
 ### 4. `price_vs_renewable_regression.py`
-Performs regression analysis of European electricity prices against natural gas prices and renewable energy share to understand price drivers.
+Performs comprehensive regression analysis of European electricity prices against natural gas prices to understand the primary cost driver in electricity markets.
 
 **Data Sources:**
 - `data/european_wholesale_electricity_price_data_monthly.csv` - Monthly wholesale electricity prices (Ember Energy)
 - `data/CMO-Historical-Data-Monthly.xlsx` - Natural gas prices (World Bank Commodity Markets)
-- `data/share-of-electricity-production-from-solar-and-wind/` - Renewable energy share (Our World in Data)
 
-**Analysis Models:**
-- **Gas-only model**: `Price = a * Gas_Cost + c`
-- **Gas + Renewable model**: `Price = a * Gas_Cost + b * Renewable_Fraction + c`
+**Analysis Model:**
+- **Gas regression model**: `Price = a * Gas_Cost + c`
+
+**Features:**
+- Country-by-country linear regression analysis with detailed statistics
+- Annual average price and gas cost calculations
+- Multi-page PDF report generation with scatter plots and regression lines
+- Summary statistics including average coefficients and R² values
+- Year-by-year data point labeling on plots
+- Comprehensive statistical output with model interpretation
+- Visual distinction of data points when excluding specific years from regression
 
 **Configuration Options:**
-- `INCLUDE_RENEWABLE`: Toggle between gas-only and gas+renewable regression
-- `INCLUDE_2022`: Option to exclude 2022 data from regression (useful for analyzing COVID-19 impact)
+- `INCLUDE_2022`: Option to exclude 2022 data from regression analysis while still displaying it on plots (useful for analyzing energy crisis impact)
+
+**Generated Outputs:**
+- `electricity_vs_gas_renewable_with_fit.pdf` - Multi-page comprehensive analysis report with individual country regression plots
+- Console output with detailed regression statistics for each country
+- Summary plot showing gas price coefficients vs model fit quality
 
 **Usage:**
 ```bash
@@ -169,8 +180,8 @@ Additional dependencies for specific scripts:
 The project employs multiple analytical approaches:
 
 1. **Correlation Analysis**: Direct correlation between renewable energy penetration and wholesale electricity prices
-2. **Regression Modeling**: Multiple regression analysis incorporating natural gas prices as a control variable
+2. **Regression Modeling**: Linear regression analysis focusing on natural gas prices as the primary driver of electricity costs
 3. **Price Component Analysis**: Breakdown of electricity prices into constituent components (generation, network, taxes)
 4. **Comparative Analysis**: Cross-country and cross-regional comparisons
 
-The European analysis uses country-level aggregated data, while the US RTO analysis uses high-resolution hourly data with load-weighted price calculations for more accurate market representation. The regression analysis helps isolate the impact of renewable energy on prices by controlling for natural gas price fluctuations, which are a major driver of electricity costs in gas-fired power generation.
+The European analysis uses country-level aggregated data, while the US RTO analysis uses high-resolution hourly data with load-weighted price calculations for more accurate market representation. The regression analysis quantifies the relationship between natural gas prices and electricity costs, demonstrating how gas price fluctuations are a major driver of electricity prices in European markets due to the significant role of gas-fired power generation in setting marginal costs.
