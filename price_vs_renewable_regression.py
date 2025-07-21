@@ -188,7 +188,7 @@ def plot_regression_results(regression_results):
                 
                 # Add slope text on the panel
                 gas_slope = result['Gas_Coeff']
-                axes[i].text(0.05, 0.95, f'Slope: {gas_slope:.3f}', 
+                axes[i].text(0.05, 0.95, f'Slope: {gas_slope:.2e}', 
                            transform=axes[i].transAxes, fontsize=10, fontweight='bold',
                            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8),
                            verticalalignment='top')
