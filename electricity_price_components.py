@@ -561,6 +561,9 @@ def create_renewable_vs_network_plot(df, renewable_df, year=2024, save_plot=True
         return f'{x:.0f}%'
     ax.xaxis.set_major_formatter(plt.FuncFormatter(percentage_formatter))
     
+    # Set y-axis limits
+    ax.set_ylim(0, 0.42)
+    
     # Adjust layout
     plt.tight_layout()
     
