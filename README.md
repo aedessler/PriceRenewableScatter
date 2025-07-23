@@ -1,13 +1,12 @@
 # Renewable Energy vs Electricity Price Analysis
 
-This project analyzes the relationship between renewable energy share and electricity prices using comprehensive datasets covering European countries and US Regional Transmission Organizations (RTOs). The analysis employs multiple methodologies including correlation studies, regression analysis, and detailed price component breakdowns to understand how renewable energy deployment affects electricity costs.
+This project analyzes the relationship between renewable energy share and electricity prices using comprehensive datasets covering European countries and US Regional Transmission Organizations (RTOs). The analysis employs multiple methodologies including correlation studies and regression analysis to understand how renewable energy deployment affects electricity costs.
 
 ## Project Overview
 
 The analysis addresses key questions about renewable energy economics:
 - **Does higher renewable energy penetration correlate with electricity prices?**
 - **What role do natural gas prices play as the primary driver of electricity costs?**
-- **How do different price components (generation, network, taxes) vary with renewable share?**
 - **What are the differences between wholesale and retail electricity markets?**
 
 ## Analysis Scripts
@@ -38,36 +37,7 @@ Comprehensive analysis of European wholesale and retail electricity prices versu
 python plotPrice.py
 ```
 
-### 2. `electricity_price_components.py`
-**European Electricity Price Component Analysis**
-
-Creates detailed analysis of electricity price components (generation, network costs, taxes/levies) across European countries using comprehensive Eurostat data.
-
-**Key Features:**
-- **Stacked Bar Charts**: Visual breakdown of electricity price components by country
-- **Diverging Bar Analysis**: Shows subsidies (negative taxes) and positive cost components
-- **Component Analysis**: Generation & supply, network costs, taxes & levies breakdown
-- **Renewable Correlation**: Additional analysis of renewable share vs network costs
-- **Comprehensive Data Processing**: Handles multiple Eurostat data sheets and consumption bands
-- **Statistical Summary**: Country rankings, component averages, and cost distributions
-
-**Data Processing:**
-- Configurable analysis by year (default: 2023) and consumption band
-- Automatic data loading from multiple Excel sheets
-- Country name standardization and data validation
-- Calculation of implied tax/subsidy amounts from total vs component costs
-
-**Generated Outputs:**
-- `electricity_price_components_2023_DB.png` - Stacked bar chart of price components
-- `renewable_vs_network_costs_2023.png` - Renewable share vs network costs scatter plot
-- Comprehensive console output with statistics and data tables
-
-**Usage:**
-```bash
-python electricity_price_components.py  
-```
-
-### 3. `price_vs_renewable_regression.py`
+### 2. `price_vs_renewable_regression.py`
 **Natural Gas Price Regression Analysis**
 
 Comprehensive regression analysis demonstrating natural gas prices as the primary driver of European electricity wholesale prices, with configurable analysis options.
@@ -99,7 +69,7 @@ Electricity_Price = a × Gas_Price + c
 python price_vs_renewable_regression.py
 ```
 
-### 4. `renewable_scatter_US.py`
+### 3. `renewable_scatter_US.py`
 **US Regional Transmission Organization (RTO) Analysis**
 
 Analysis of renewable energy penetration vs load-weighted wholesale electricity prices across major US electricity markets using high-resolution hourly data.
@@ -178,23 +148,6 @@ python renewable_scatter_US.py
 - **Data Types**: Annual energy balances, electricity production, consumption data
 - **Regulation**: Harmonized under Regulation (EC) No 1099/2008
 
-#### Electricity Price Components
-- **Source**: [Eurostat Energy Database (nrg_pc_204_c)](https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_204_c__custom_17509578/default/table?lang=en)
-- **File**: `data/nrg_pc_204_c__custom_17509578_spreadsheet.xlsx`
-- **Description**: Detailed breakdown of household electricity price components
-- **Coverage**: 45 European countries/regions including EU27, Euro area
-- **Time Period**: 2017-2024
-- **Components**: 15+ price components including:
-  - Energy supply costs
-  - Network transmission and distribution costs
-  - Various taxes, fees, and levies
-  - VAT and environmental taxes
-  - Renewable energy taxes and allowances
-  - Capacity charges and balancing costs
-- **Consumption Bands**: Two categories analyzed
-  - DA: Less than 1,000 kWh annual consumption
-  - DB: 1,000-2,499 kWh annual consumption
-
 ### US RTO Data Sources
 - **Source**: Regional Transmission Organization hourly operational data
 - **Location**: External cloud storage (iCloud Documents)  
@@ -206,14 +159,84 @@ python renewable_scatter_US.py
 ## Generated Analysis Products
 
 ### Visualization Outputs
-- **electricity_price_components_2023_DB.png**: Stacked bar chart showing European electricity price component breakdown by country
-- **renewable_vs_network_costs_2023.png**: Scatter plot analysis of renewable share vs network infrastructure costs
 - **electricity_vs_gas_renewable_with_fit.pdf**: Comprehensive multi-page regression analysis report
 
 ### Analysis Reports
 - **Multi-country regression analysis**: Individual country gas price impact assessments
 - **RTO comparison tables**: US regional electricity market analysis summaries
 - **Statistical correlation studies**: European and US market renewable energy impact quantification
+
+## Technical Requirements
+
+### Core Dependencies
+```
+pandas>=1.3.0          # Data manipulation and analysis
+numpy>=1.20.0          # Numerical computing
+matplotlib>=3.5.0      # Plotting and visualization  
+seaborn>=0.11.0        # Statistical data visualization
+scipy>=1.7.0           # Scientific computing and statistics
+pathlib                # File system path handling
+warnings               # Clean console output
+```
+
+### Additional Dependencies
+```
+scikit-learn>=1.0.0    # Machine learning (LinearRegression, r2_score)
+openpyxl>=3.0.0        # Excel file reading (.xlsx support)
+```
+
+### Installation
+```bash
+pip install pandas numpy matplotlib seaborn scipy scikit-learn openpyxl
+```
+
+## Analysis Methodology
+
+### 1. Correlation Analysis
+Direct statistical correlation between renewable energy penetration and electricity prices across different markets and time periods.
+
+### 2. Regression Modeling  
+**Primary Model**: Linear regression analysis focusing on natural gas prices as the dominant driver of electricity costs in European markets.
+
+**Rationale**: Gas-fired power plants often set marginal pricing in European electricity markets due to merit order dispatch principles.
+
+### 3. Load-Weighted Analysis
+**US RTO Analysis**: Uses load-weighted price calculations rather than simple averages to reflect actual market conditions and electricity consumption patterns.
+
+### 4. Cross-Regional Comparison
+Comparative analysis methodology:
+- **European Analysis**: Country-level aggregated annual data
+- **US Analysis**: Regional market-level hourly data with load-weighting
+- **Temporal Analysis**: Multi-year comparisons to identify trends
+
+## Research Implications
+
+### Key Findings Framework
+The analysis framework enables investigation of:
+
+1. **Merit Order Effects**: How renewable energy (zero marginal cost) affects wholesale electricity pricing
+2. **Market Structure**: Differences between European country-level and US regional market dynamics
+3. **Primary Cost Drivers**: Quantification of natural gas price influence on electricity markets
+
+### Analytical Robustness
+- **Multiple Data Sources**: Cross-validation using Ember, Eurostat, World Bank, and RTO data
+- **Statistical Validation**: Correlation analysis, regression diagnostics, R² reporting
+- **Temporal Consistency**: Multi-year analysis to account for market variations
+- **Geographic Coverage**: European country-level and US regional market analysis
+
+## Data Update and Maintenance
+
+### Update Frequencies
+- **European wholesale prices**: Monthly updates available from Ember Energy
+- **Renewable share data**: Annual updates from Our World in Data
+- **Eurostat data**: Annual updates for retail prices
+- **US RTO data**: Hourly updates (analysis typically uses annual aggregations)
+
+### Data Quality Notes
+- **Missing Data Handling**: Scripts include comprehensive data validation and missing value handling
+- **Country Name Standardization**: Automatic mapping for different naming conventions across datasets
+- **Unit Consistency**: Automatic conversion between EUR/MWh and EUR/kWh where appropriate
+- **Temporal Alignment**: Careful handling of different data release schedules and time periods
 
 ## License and Attribution
 
